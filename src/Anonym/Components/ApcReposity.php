@@ -8,37 +8,24 @@
      */
 
     namespace Anonym\Components\Config;
-
     use Anonym\Components\Config\Reposity;
-    use Memcache;
 
     /**
-     * Yükleme işlemlerini yaparken Redis eklentisini kullanılır
-     *
-     * Class MemcacheReposity
+     * Class ApcReposity
      * @package Anonym\Components\Config
      */
-    class MemcacheReposity extends Reposity
+    class ApcReposity extends Reposity
     {
-
-        /**
-         * Redis bağlantısı
-         *
-         * @var Memcache
-         */
-        private $memcacheObj;
 
         /**
          * Sınıfı başlatır
          *
          * @param array $cache
-         * @param Memcache $memcache
          */
-        public function __construct($cache = [], Memcache $memcache = null)
+        public function __construct($cache = [])
         {
             parent::__construct($cache);
-            $this->setMemcacheObj($memcache);
-            $this->checkMemcacheExtension();
+            $this->checkApcExtension();
         }
 
         /**
@@ -48,8 +35,8 @@
          * @return bool|mixed|string
          */
         public function get($name = ''){
-            if(false === $var = $this->getMemcacheObj()->get($name)){
-                $this->getMemcacheObj()->set($name, $var = parent::get($name));
+            if(false === $var = apc_fetch($name)){
+                apc_store($name, $var = parent::get($name));
             }
 
             return $var;
@@ -60,36 +47,17 @@
          *
          * @throws ExtensionNotLoadedException
          */
-        private function checkMemcacheExtension()
+        private function checkApcExtension()
         {
-            if (!extension_loaded('memcache')) {
+            if (!function_exists('apc_store')) {
                 throw new ExtensionNotLoadedException(
                     sprintf(
                         '%s eklentiniz
                          yüklü olmadüı için %s sınıfını kullanamıyorsunuz',
-                        'memcache',
+                        'apc',
                         __CLASS__
                     )
                 );
             }
-        }
-
-        /**
-         * @return \Redis
-         */
-        public function getMemcacheObj()
-        {
-            return $this->memcacheObj;
-        }
-
-        /**
-         * @param \Redis $memcacheObj
-         * @return MemcacheReposity
-         */
-        public function setMemcacheObj($memcacheObj)
-        {
-            $this->memcacheObj = $memcacheObj;
-
-            return $this;
         }
     }

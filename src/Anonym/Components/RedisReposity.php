@@ -31,6 +31,7 @@
          * Sınıfı başlatır
          *
          * @param array $cache
+         * @param Redis $redis
          */
         public function __construct($cache = [], Redis $redis = null)
         {
