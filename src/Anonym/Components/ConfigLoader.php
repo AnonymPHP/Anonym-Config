@@ -73,9 +73,8 @@
 
             }
 
-            Reposity::setConfigs($items);
 
-            return true;
+            return $items;
         }
 
         /**
@@ -93,7 +92,7 @@
                     if (is_array($return)) {
                         $configs[$name] = $return;
                     } else {
-                        throw new Exception(
+                        throw new ThereIsntReturnedValueException(
                             sprintf(
                                 '%s ayar dosyasında herhangi bir değer döndürülmemiş
                                  veya yanlış ayar döndürüldü',
