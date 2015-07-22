@@ -10,11 +10,12 @@
     namespace Anonym\Components\Config;
     use Anonym\Components\Config\Reposity;
 
+
     /**
-     * Class ApcReposity
+     * Class XcacheReposity
      * @package Anonym\Components\Config
      */
-    class ApcReposity extends Reposity
+    class XcacheReposity extends Reposity
     {
 
         /**
@@ -25,7 +26,7 @@
         public function __construct($cache = [])
         {
             parent::__construct($cache);
-            $this->checkApcExtension();
+            $this->checkXcacheExtension();
         }
 
         /**
@@ -35,29 +36,29 @@
          * @return bool|mixed|string
          */
         public function get($name = ''){
-            if(false === $var = apc_fetch($name)){
-                apc_store($name, $var = parent::get($name));
+            if(false === $var = xcache_get($name)){
+                xcache_set($name, $var = parent::get($name));
             }
 
             return $var;
         }
-
         /**
-         * Apc eklentisinin yüklü olup olmadığını kontrol eder
+         * Xcache eklentisinin yüklü olup olmadığını kontrol eder
          *
          * @throws ExtensionNotLoadedException
          */
-        private function checkApcExtension()
+        private function checkXcacheExtension()
         {
-            if (!function_exists('apc_store')) {
+            if (!extension_loaded('xcache')) {
                 throw new ExtensionNotLoadedException(
                     sprintf(
                         '%s eklentiniz
                          yüklü olmadüı için %s sınıfını kullanamıyorsunuz',
-                        'apc',
+                        'xcache',
                         __CLASS__
                     )
                 );
             }
         }
     }
+
