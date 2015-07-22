@@ -10,26 +10,60 @@
     namespace Anonym\Components\Config;
     use ArrayAccess;
     /**
-     * Class Reposity
-     * @package Anonym\Components\Config
+     * @author vahitserifsaglam <vahit.serif119@gmail.com>
+     * @copyright AnonymMedya, 2015
      */
-    class Reposity implements  ArrayAccess
+    class Reposity implements ArrayAccess
     {
-        /**
-         * Ayar verilerini tutar
-         *
-         * @var array
-         */
-        private static $configs;
+        private $cache;
+        public function __construct(array $cache = [])
+        {
+            $this->setCache($cache);
+        }
 
         /**
-         * Değeri döndürür
-         *
-         * @param string $name
-         * @return mixed
+         * @return array
          */
-        public static function get($name = ''){
-            $parse = static::parse($name);
+        public function getCache()
+        {
+            return $this->cache;
+        }
+
+        /**
+         * @param array $cache
+         * @return Reposity
+         */
+        public function setCache($cache)
+        {
+            $this->cache = $cache;
+
+            return $this;
+        }
+
+
+        /**
+         * @param string $name
+         * @return bool
+         */
+        public function has($name = '')
+        {
+            $get = $this->get($name);
+            if (null !== $get) {
+                return $get;
+            } else {
+                return false;
+            }
+        }
+        /**
+         * İstenilen ayarı döndürür
+         *
+         * @param string $config
+         * @return boolean|mixed
+         * @access public
+         */
+        public function get($config)
+        {
+            $parse = $this->parse($config);
             if (count($parse) === 1) {
                 $task = $parse[0];
             } elseif (count($parse) === 2) {
@@ -37,8 +71,8 @@
             } elseif (count($parse) === 3) {
                 list($task, $method, $fname) = $parse;
             }
-            if (isset(static::$configs[$task])) {
-                $return = static::$configs[$task];
+            if (isset($this->cache[$task])) {
+                $return = $this->cache[$task];
             } else {
                 return null;
             }
@@ -54,100 +88,15 @@
             }
             return $return;
         }
-
         /**
-         * Veriye yeni değer ataması yapar
-         *
-         * @param string $name
-         * @param string $value
-         * @return bool
-         */
-        public static function set($name = '', $value = ''){
-            if (!strstr($name, ".")) {
-                static::$configs[$name] = $value;
-            } else {
-                $parse = static::parse($name);
-                if (count($parse) === 2) {
-                    list($name, $fname) = $parse;
-                    static::$configs[$name][$fname] = $value;
-                } elseif (count($parse) === 3) {
-                    list($name, $fname, $sname) = $parse;
-                    static::$configs[$name][$fname][$sname] = $value;
-                }
-            }
-
-            return true;
-        }
-
-
-        /**
-         * @param string $name eklenecek değerin ismi
-         * @param string $value değeri
-         */
-        public static function add($name = '', $value = '')
-        {
-            if (!strstr($name, ".")) {
-                static::$configs[$name] = array_merge(static::$configs[$name], [$value]);
-            } else {
-                $parse = static::parse($name);
-                if (count($parse) === 2) {
-                    list($name, $fname) = $parse;
-                    static::$configs[$name][$fname] = array_merge(static::$configs[$name][$fname][], [$value]);
-                } elseif (count($parse) === 3) {
-                    list($name, $fname, $sname) = $parse;
-                    static::$configs[$name][$fname][$sname] = array_merge(static::$configs[$name][$fname][$sname], [$value]);
-                }
-            }
-        }
-
-        /**
-         * Veri varsa siler yoksa boş geçer
-         *
-         * @param string $name
-         * @return bool
-         */
-        public  static  function delete($name = ''){
-            return static::set($name, null);
-        }
-
-        /**
-         * Ayar varmı yokmu diye kontrol eder
-         *
-         * @param string $name
-         * @return mixed
-         */
-        public static function has($name = ''){
-            $get = static::get($name);
-            if (null !== $get) {
-                return $get;
-            } else {
-                return false;
-            }
-        }
-
-        /**
-         * @return array
-         */
-        public static function getConfigs()
-        {
-            return self::$configs;
-        }
-
-        /**
-         * @param array $configs
-         */
-        public static function setConfigs($configs)
-        {
-            self::$configs = $configs;
-        }
-
-        /**
-         * Metni parçalar
+         * Metni . karekterine göre parçalar ve görev listesini oluşturur
          *
          * @param string $config
-         * @return array
+         * @return array|string
          */
-        private static function parse($config = ''){
+        private static function parse(
+            $config = ''
+        ) {
             if (strstr($config, ".")) {
                 $parse = explode('.', $config);
                 return $parse;
@@ -155,8 +104,44 @@
                 return (array)$config;
             }
         }
-
-
+        /**
+         * @param string $name verinin ismi
+         * @param string $value değeri
+         */
+        public function set($name, $value = '')
+        {
+            if (!strstr($name, ".")) {
+                $this->cache[$name] = $value;
+            } else {
+                $parse = $this->parse($name);
+                if (count($parse) === 2) {
+                    list($name, $fname) = $parse;
+                    $this->cache[$name][$fname] = $value;
+                } elseif (count($parse) === 3) {
+                    list($name, $fname, $sname) = $parse;
+                    $this->cache[$name][$fname][$sname] = $value;
+                }
+            }
+        }
+        /**
+         * @param string $name eklenecek değerin ismi
+         * @param string $value değeri
+         */
+        public function add($name = '', $value = '')
+        {
+            if (!strstr($name, ".")) {
+                $this->cache[$name] = array_merge($this->cache[$name], [$value]);
+            } else {
+                $parse = $this->parse($name);
+                if (count($parse) === 2) {
+                    list($name, $fname) = $parse;
+                    $this->cache[$name][$fname] = array_merge($this->cache[$name][$fname][], [$value]);
+                } elseif (count($parse) === 3) {
+                    list($name, $fname, $sname) = $parse;
+                    $this->cache[$name][$fname][$sname] = array_merge($this->cache[$name][$fname][$sname], [$value]);
+                }
+            }
+        }
         /**
          * Dizi olarak erişilirken itemin olup olmadığına bakılır
          *
@@ -165,7 +150,7 @@
          */
         public function offsetExists($key)
         {
-            return static::has($key);
+            return $this->has($key);
         }
         /**
          * Dizi olarak erişilirken Veri çekmekte kullanılır
@@ -175,7 +160,7 @@
          */
         public function offsetGet($key)
         {
-            return static::get($key);
+            return $this->get($key);
         }
         /**
          * Dizi olarak erişilirken veri eklemede kullanılır
@@ -186,7 +171,7 @@
          */
         public function offsetSet($key, $value)
         {
-            static::set($key, $value);
+            $this->set($key, $value);
         }
         /**
          * Array olarak erişilirken veri unset edildiğinde yapılır
@@ -196,6 +181,6 @@
          */
         public function offsetUnset($key)
         {
-            static::set($key, null);
+            $this->set($key, null);
         }
     }
