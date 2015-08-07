@@ -7,12 +7,6 @@
   "homepage": "https://gemframework.com",
   "description": "AnonymFramework Config Loader Orm",
   "license": "MIT",
-  "repositories": [
-    {
-      "type": "git",
-      "url": "git://github.com/AnonymPHP/Anonym-Config.git"
-    }
-  ],
   "minimum-stability": "dev",
   "authors": [
     {
