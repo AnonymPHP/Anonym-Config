@@ -9,6 +9,7 @@
 
 namespace Anonym\Components\Config;
 
+use Anonym\Support\Arr;
 use ArrayAccess;
 
 /**
@@ -49,12 +50,7 @@ class Reposity implements ArrayAccess
      */
     public function has($name = '')
     {
-        $get = $this->get($name);
-        if (null !== $get) {
-            return $get;
-        } else {
-            return false;
-        }
+        return Arr::has(static::$cache, $name);
     }
 
     /**
@@ -66,16 +62,7 @@ class Reposity implements ArrayAccess
      */
     public function get($config)
     {
-
-        $array = static::getCache();
-        foreach (explode('.', $config) as $segment) {
-            if (!is_array($array) || !array_key_exists($segment, $array)) {
-                return [];
-            }
-
-            $array = $array[$segment];
-        }
-        return $array;
+        return Arr::get(static::$cache, $config, []);
     }
 
 
@@ -86,19 +73,7 @@ class Reposity implements ArrayAccess
      */
     public function set($name, $value = '')
     {
-        $array = static::getCache();
-        $keys = explode('.', $name);
-        while (count($keys) > 1) {
-            $key = array_shift($keys);
-            // If the key doesn't exist at this depth, we will just create an empty array
-            // to hold the next value, allowing us to create the arrays to hold final
-            // values at the correct depth. Then we'll keep digging into the array.
-            if (! isset($array[$key]) || ! is_array($array[$key])) {
-                $array[$key] = [];
-            }
-            $array = &$array[$key];
-        }
-        $array[array_shift($keys)] = $value;
+        Arr::set(static::$cache, $name, $value);
         return $this;
     }
 
