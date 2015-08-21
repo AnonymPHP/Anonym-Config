@@ -18,11 +18,10 @@
   "require": {
     "php": ">=5.4.0"
   },
-  "require-dev":
-  {
-    "symfony/finder": "2.7.*"
+  "require-dev": {
+    "symfony/finder": "2.7.*",
+    "anonym-components/support": "~1.2@dev"
   },
-
   "autoload": {
     "psr-4": {
       "Anonym\\Components\\Config\\": "src/Anonym/Components/"
