@@ -50,7 +50,7 @@
          *
          * Ayar Dosyalarını Yükler
          *
-         * @return bool
+         * @return array
          */
         public function loadConfigs()
         {
