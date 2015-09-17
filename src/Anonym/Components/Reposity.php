@@ -101,6 +101,14 @@ class Reposity implements ArrayAccess
     }
 
     /**
+     * get all config files
+     *
+     * @return array
+     */
+    public function all(){
+        return $this->getCache();
+    }
+    /**
      * Dizi olarak erişilirken itemin olup olmadığına bakılır
      *
      * @param  string $key
