@@ -62,7 +62,7 @@
             if(null !== $cached && file_exists($cached)){
                 $items = require $cached;
             }else{
-                $load = $this->getAllConfigFiles();
+                $load = $this->loadConfigItems($this->getAllConfigFiles());
 
                 $items = (is_array($load) && count($load) > 0) ? $load : [];
             }
