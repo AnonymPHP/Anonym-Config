@@ -59,22 +59,15 @@
 
             $cached = $this->getCachedConfigPath();
 
-            if (null !== $cached) {
-                if (file_exists($cached)) {
-                    $items = require $cached;
-                }
-            } else {
-                $files = $this->getAllConfigFiles();
-                if (is_array($files)) {
-                    if (count($files) > 0) {
-                        $items = $this->loadConfigItems($files);
-                    }
-                }
+            if(null !== $cached && file_exists($cached)){
+                $items = require $cached;
+            }else{
+                $load = $this->getAllConfigFiles();
 
+                $items = (is_array($load) && count($load) > 0) ? $load : [];
             }
 
-
-            return isset($items) ? $items : [];
+            return $items ?: [];
         }
 
         /**
