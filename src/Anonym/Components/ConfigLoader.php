@@ -74,7 +74,7 @@
             }
 
 
-            return $items;
+            return isset($items) ? $items : [];
         }
 
         /**
